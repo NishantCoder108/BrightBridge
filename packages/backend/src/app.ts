@@ -1,11 +1,12 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import userRoutes from "./routes/userRoutes";
+import courseRoutes from "./routes/courseRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello Typescript");
-});
+app.use("/api", userRoutes);
+app.use("/api", courseRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server  running on  http://localhost:${PORT}`);
