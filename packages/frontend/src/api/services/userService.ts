@@ -10,9 +10,10 @@ export const signupUser = async (email: string, password: string) => {
     if (axios.isAxiosError(error)) {
       const serverError = error as AxiosError<{ message: string }>;
       console.log({ serverError });
-      if (serverError?.message) {
+      if (serverError.response) {
         throw new Error(
-          serverError.message || "An error occurred during signup."
+          serverError.response.data.message ||
+            "An error occurred during signup."
         );
       }
     }
@@ -28,10 +29,9 @@ export const loginUser = async (email: string, password: string) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const serverError = error as AxiosError<{ message: string }>;
-      console.log({ serverError });
-      if (serverError?.message) {
+      if (serverError.response) {
         throw new Error(
-          serverError.message || "An error occurred during login."
+          serverError.response.data.message || "An error occurred during login."
         );
       }
     }
