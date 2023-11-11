@@ -5,7 +5,6 @@ import userRoutes from "./routes/userRoutes";
 import courseRoutes from "./routes/courseRoutes";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 const mongoUri =
   process.env.MONGO_URI || "mongodb://localhost:27017/BrightBridgeDB";
 
@@ -17,9 +16,5 @@ mongoose
 app.use(express.json());
 app.use("/api", userRoutes);
 app.use("/api", courseRoutes);
-
-app.listen(PORT, () => {
-  console.log(`Server  running on  http://localhost:${PORT}`);
-});
 
 export default app;
