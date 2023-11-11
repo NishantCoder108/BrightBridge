@@ -13,7 +13,7 @@ router.get("/users", (req, res) => {
 //Signup
 router.post(
   "/signup",
-  [body("email").isEmail(), body("password").isLength({ min: 6 })],
+  [body("email").isEmail(), body("password").isLength({ min: 3 })],
   async (req: Request, res: Response) => {
     // Input validation
     const errors = validationResult(req);
@@ -21,19 +21,30 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
+    function generateUsername(email: string) {
+      const usernamePart = email.split("@")[0];
+      const randomString = Math.random().toString(36).substring(2, 7);
+
+      return `${usernamePart.substring(2)}_${randomString}`;
+    }
+
     try {
+      const userData = req.body;
+
       // Check if user already exists
-      const existingUser = await User.findOne({ email: req.body.email });
+      const existingUser = await User.findOne({ email: userData.email });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use." });
       }
 
+      userData.username = generateUsername(userData.email);
+
       // Create and save the new user
-      const newUser = new User(req.body);
+      const newUser = new User(userData);
       await newUser.save();
 
       // Respond with the created user
-      res.status(201).json({ message: "Signup Successfully." });
+      res.status(201).json({ message: "User created successfully" });
     } catch (err: any) {
       // General error handling
       res.status(500).json({ message: "Server error", error: err.message });
