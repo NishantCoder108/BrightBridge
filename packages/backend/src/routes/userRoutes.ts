@@ -12,7 +12,7 @@ router.get("/users", (req, res) => {
 
 //Signup
 router.post(
-  "/users",
+  "/signup",
   [body("email").isEmail(), body("password").isLength({ min: 6 })],
   async (req: Request, res: Response) => {
     // Input validation
@@ -33,7 +33,7 @@ router.post(
       await newUser.save();
 
       // Respond with the created user
-      res.status(201).json(newUser);
+      res.status(201).json({ message: "Signup Successfully." });
     } catch (err: any) {
       // General error handling
       res.status(500).json({ message: "Server error", error: err.message });

@@ -3,7 +3,7 @@ import axiosInstance from "../axiosInstance";
 
 export const signupUser = async (email: string, password: string) => {
   try {
-    const response = await axiosInstance.post("/users", { email, password });
+    const response = await axiosInstance.post("/signup", { email, password });
     console.log("Signup User", { response });
     return response.data;
   } catch (error) {
