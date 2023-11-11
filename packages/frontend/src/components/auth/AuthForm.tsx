@@ -2,7 +2,9 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AuthFormData, AuthSchema } from "../../authValidation";
+import { AuthFormData, AuthSchema } from "../../utils/authValidation";
+import { loginUser, signupUser } from "../../api/services/userService";
+import { useNavigate } from "react-router-dom";
 
 const AuthForm: React.FC = () => {
   const {
@@ -14,10 +16,28 @@ const AuthForm: React.FC = () => {
   });
 
   const [isSignup, setIsSignUp] = useState<boolean>(false);
+  const [errResponse, setErrResponse] = useState<string>("");
 
-  const onSubmit: SubmitHandler<AuthFormData> = (data) => {
-    console.log(data);
-    // Handle login logic here
+  const navigate = useNavigate();
+  const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
+    const { email, password } = data;
+
+    const authApi = isSignup
+      ? signupUser(email, password)
+      : loginUser(email, password);
+
+    try {
+      const userData = await authApi;
+      console.log({ userData });
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      let errorMessage = "Unknown error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setErrResponse(errorMessage);
+    }
   };
 
   const handleLoginForm = () => {
@@ -72,6 +92,11 @@ const AuthForm: React.FC = () => {
           >
             {isSignup ? "Sign Up" : "Login"}
           </button>{" "}
+          {errResponse && (
+            <p className="text-red-500 text-xs text-center italic">
+              {errResponse}
+            </p>
+          )}
         </form>
 
         <div className="mt-4 text-center">
