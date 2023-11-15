@@ -1,13 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import Navbar from "../layout/Navbar";
 
 const HomePage = () => {
-  return (
-    <div>
-      <p> HomePage </p>
-      <Link to="/login"> Login Page</Link>
-    </div>
-  );
+  return <Navbar />;
 };
 
 export default HomePage;
