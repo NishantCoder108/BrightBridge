@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthFormData, AuthSchema } from "../../utils/authValidation";
 import { loginUser, signupUser } from "../../api/services/userService";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setToken } from "../../redux/slices/authSlice";
 
 const AuthForm: React.FC = () => {
   const {
@@ -18,6 +20,7 @@ const AuthForm: React.FC = () => {
   const [isSignup, setIsSignUp] = useState<boolean>(false);
   const [errResponse, setErrResponse] = useState<string>("");
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
     const { email, password } = data;
@@ -29,6 +32,7 @@ const AuthForm: React.FC = () => {
     try {
       const userData = await authApi;
       console.log({ userData });
+      dispatch(setToken(userData));
       navigate("/");
     } catch (error) {
       console.error(error);

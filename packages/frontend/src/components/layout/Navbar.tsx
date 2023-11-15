@@ -4,17 +4,20 @@ import { toggleTheme } from "../../redux/slices/themeSlice";
 import { RootState } from "../../redux/store";
 import { Link } from "react-router-dom";
 import Button from "../common/Button";
+import { clearToken } from "../../redux/slices/authSlice";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const theme = useSelector((state: RootState) => state.theme.theme);
+  const tokenAccess = useSelector((state: RootState) => state.course.token);
 
+  console.log({ tokenAccess });
   const dispatch = useDispatch();
 
   return (
     <div>
       <nav
-        className={`bg-gray-800 text-white py-1 ${
+        className={`bg-gray-800 text-white py-3 ${
           theme === "dark" ? "bg-gray-800 " : "bg-[#f2eeee91] text-gray-800"
         } text-${theme === "dark" ? "white" : "gray-800"} `}
       >
@@ -74,9 +77,19 @@ const Navbar: React.FC = () => {
 
               {/* Auth Buttons */}
 
-              <Button variant="gradient" size="medium">
-                <Link to="/login">Login</Link>
-              </Button>
+              {tokenAccess ? (
+                <Button
+                  onClick={() => dispatch(clearToken())}
+                  variant="gradient"
+                  size="medium"
+                >
+                  <Link to="/login">Logout</Link>
+                </Button>
+              ) : (
+                <Button variant="gradient" size="medium">
+                  <Link to="/login">Login</Link>
+                </Button>
+              )}
             </div>
             {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center">
@@ -102,12 +115,48 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         <div className={`${isOpen ? "block" : "hidden"} md:hidden`}>
-          <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-700">
+          {/* <a href="#" className="block py-2 px-5 text-sm hover:bg-gray-700">
             Home
           </a>
-          <a href="#" className="block py-2 px-4 text-sm hover:bg-gray-700">
+          <a href="#" className="block py-2 px-6 text-sm hover:bg-gray-700">
             About
-          </a>
+          </a> */}
+          <div className="  md:flex items-center space-x-2 pt-6 pb-2">
+            <input
+              type="text"
+              placeholder="Search"
+              className="ml-4 px-2 py-1 rounded text-black"
+            />
+
+            <Button variant="gradient" size="medium">
+              Search
+            </Button>
+          </div>
+          <div className=" md:flex items-center  ml-4">
+            <button className="block" onClick={() => dispatch(toggleTheme())}>
+              {/* Icon or text to represent theme toggle */}
+              <span>{theme === "light" ? "🌞" : "🌜"}</span>
+            </button>
+
+            {tokenAccess ? (
+              <Button
+                onClick={() => dispatch(clearToken())}
+                className="mt-2 ml-[0px] mb-1"
+                variant="gradient"
+                size="medium"
+              >
+                <Link to="/login">Logout</Link>
+              </Button>
+            ) : (
+              <Button
+                variant="gradient"
+                size="medium"
+                className="mt-2 ml-['-9px'] mb-1"
+              >
+                <Link to="/login">Login</Link>
+              </Button>
+            )}
+          </div>
           {/* More nav items */}
         </div>
       </nav>

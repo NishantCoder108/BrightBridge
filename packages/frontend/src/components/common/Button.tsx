@@ -3,9 +3,10 @@ import React from "react";
 // Define the props for the button
 interface ButtonProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   variant?: "primary" | "secondary" | "gradient";
   size?: "small" | "medium" | "large";
+  className?: string;
   // Add other props as needed
 }
 
@@ -14,6 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   variant = "primary",
   size = "medium",
+  className,
 }) => {
   // Class names for different variants and sizes
   const variantClasses = {
@@ -32,7 +34,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`rounded ${variantClasses[variant]} ${sizeClasses[size]} focus:outline-none`}
+      className={`rounded ${variantClasses[variant]} ${sizeClasses[size]} ${className} focus:outline-none`}
     >
       {children}
     </button>
