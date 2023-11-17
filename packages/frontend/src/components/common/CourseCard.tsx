@@ -1,5 +1,9 @@
 import React from "react";
 import Button from "./Button";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { Link } from "react-router-dom";
+import VideoPlayer from "../pages/VideoPlayerPage";
 
 interface CourseCardProps {
   title: string;
@@ -7,6 +11,7 @@ interface CourseCardProps {
   description: string;
   instructor: string;
   price: string;
+  handleVideo: (watchNowHandler: () => void) => void;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
@@ -15,7 +20,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   description,
   instructor,
   price,
+  handleVideo,
 }) => {
+  const isToken = useSelector((state: RootState) => state.course.token);
   return (
     <div className="max-w-xs rounded overflow-hidden shadow-lg">
       <img className="w-full" src={imageUrl} alt={`Image of ${title}`} />
@@ -32,13 +39,22 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </span>
       </div>
       <div className="px-6 pb-4">
-        <Button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          variant="gradient"
-          size="small"
-        >
-          Enroll Now
-        </Button>
+        {!isToken ? (
+          <Link
+            to="/login"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Enroll Now
+          </Link>
+        ) : (
+          <Button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            variant="gradient"
+            size="small"
+          >
+            <VideoPlayer handleVideo={handleVideo} />
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,11 @@ import { RootState } from "../../redux/store";
 
 const CoursePage: React.FC = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
+
+  const handleVideoFunction = (watchNowHandler: () => void): void => {
+    // Some logic here
+    watchNowHandler();
+  };
   return (
     <div
       className={`p-8 items-start justify-evenly flex flex-wrap gap-3 h-[95vh] ${
@@ -20,6 +25,7 @@ const CoursePage: React.FC = () => {
         description="A comprehensive guide to mastering React. Perfect for beginners and experts alike."
         instructor="Nishant | Js"
         price="Free"
+        handleVideo={handleVideoFunction}
       />
       <CourseCard
         title="Next.js"
@@ -27,6 +33,7 @@ const CoursePage: React.FC = () => {
         description="Explore Next.js: Elevate your web development with React's powerful, production-ready framework."
         instructor="Nishant | Js"
         price="Free"
+        handleVideo={handleVideoFunction}
       />
       <CourseCard
         title="JavaScript"
@@ -34,6 +41,7 @@ const CoursePage: React.FC = () => {
         description="Uncover the power of JavaScript: Learn to craft dynamic, interactive web experiences with this foundational programming language."
         instructor="Amit Kumar"
         price="₹150"
+        handleVideo={handleVideoFunction}
       />
     </div>
   );
