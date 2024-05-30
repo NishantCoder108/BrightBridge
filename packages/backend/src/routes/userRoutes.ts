@@ -187,4 +187,8 @@ router.get(
         }
     }
 );
+
+router.post("/me", isAuthenticate(secret), (req: IAuthRequest, res) => {
+    res.json(req.user);
+});
 export default router;
