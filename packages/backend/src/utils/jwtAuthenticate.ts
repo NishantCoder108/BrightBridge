@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import { IAuthRequest, IValidationError } from "../interfaces/authInterface";
+import { NextFunction, Response } from "express";
 
 const createJWTToken = (payload: object | string, secret: string) => {
     try {
@@ -26,4 +28,31 @@ const verifyJWTToken = (token: string, secret: string) => {
     }
 };
 
-export { createJWTToken, verifyJWTToken };
+const isAuthenticate =
+    (secret: string | undefined) =>
+    (req: IAuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const token = req.headers["authorization"]?.split(" ")[1];
+            if (!token || !secret) {
+                return res.status(401).json({
+                    message: "You are not authenticated",
+                });
+            }
+
+            const decoded = verifyJWTToken(token, secret);
+
+            req.user = decoded;
+            next();
+        } catch (error) {
+            const validationError = error as IValidationError;
+
+            console.log({ validationError });
+            res.status(401).json({
+                message: "Invalid token",
+                error: validationError.message || "Unknown error",
+            });
+            return;
+        }
+    };
+
+export { createJWTToken, verifyJWTToken, isAuthenticate };
