@@ -1,44 +1,14 @@
-import Admin from "../models/admin.models";
-
-import User from "../models/user.models";
 import Course from "../models/course.models";
-
-import express, { NextFunction, Request, Response } from "express";
-import { createJWTToken, verifyJWTToken } from "../utils/jwtAuthenticate";
+import express, { NextFunction, Request, Response, Router } from "express";
+import {
+    createJWTToken,
+    isAuthenticate,
+    verifyJWTToken,
+} from "../utils/jwtAuthenticate";
 import { IAuthRequest, IValidationError } from "../interfaces/authInterface";
-import { ICourse } from "../interfaces/courseInterface";
 
-const app = express();
+const app = Router();
 const secret = process.env.ADMIN_SECRET_KEY;
-
-const isAuthenticate = (
-    req: IAuthRequest,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
-        const token = req.headers["authorization"]?.split(" ")[1];
-        if (!token || !secret) {
-            return res.status(401).json({
-                message: "You are not authenticated",
-            });
-        }
-
-        const decoded = verifyJWTToken(token, secret);
-
-        req.user = decoded;
-        next();
-    } catch (error) {
-        const validationError = error as IValidationError;
-
-        console.log({ validationError });
-        res.status(401).json({
-            message: "Invalid token",
-            error: validationError.message || "Unknown error",
-        });
-        return;
-    }
-};
 
 // //Post
 // app.post("/signup", async (req, res) => {
@@ -112,7 +82,7 @@ app.post("/login", async (req, res) => {
 });
 
 //Create course
-app.post("/courses", isAuthenticate, async (req, res) => {
+app.post("/courses", isAuthenticate(secret), async (req, res) => {
     const { imageurl, title, description, price, isPublished } = req.body;
 
     try {
@@ -141,7 +111,7 @@ app.post("/courses", isAuthenticate, async (req, res) => {
 });
 
 //Get all courses list
-app.get("/courses", isAuthenticate, async (req, res) => {
+app.get("/courses", isAuthenticate(secret), async (req, res) => {
     try {
         const course = await Course.find({});
 
@@ -164,7 +134,7 @@ app.get("/courses", isAuthenticate, async (req, res) => {
 });
 
 // Update course
-app.put("/courses/:courseId", isAuthenticate, async (req, res) => {
+app.put("/courses/:courseId", isAuthenticate(secret), async (req, res) => {
     const courseId = req.params.courseId;
     // const { imageurl, title, description, price, isPublished } = req.body;
 
@@ -189,7 +159,7 @@ app.put("/courses/:courseId", isAuthenticate, async (req, res) => {
 
 //Delete Course
 
-app.delete("/courses/:courseId", isAuthenticate, async (req, res) => {
+app.delete("/courses/:courseId", isAuthenticate(secret), async (req, res) => {
     const courseId = req.params.courseId;
 
     try {
