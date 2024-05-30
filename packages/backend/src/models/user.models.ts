@@ -1,7 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
-import { Schema } from "mongoose";
-
+interface IUser extends Document {
+    password: string;
+    email: string;
+    purchasedCourses: string[];
+}
 const userSchema = new Schema({
     password: {
         type: String,
@@ -28,4 +32,12 @@ const userSchema = new Schema({
     ],
 });
 
+userSchema.pre<IUser>("save", async function (next) {
+    if (this.isModified("password") || this.isNew) {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(this.password, salt);
+        this.password = hash;
+    }
+    next();
+});
 export default mongoose.model("User", userSchema);
