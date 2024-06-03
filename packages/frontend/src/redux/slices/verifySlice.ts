@@ -22,6 +22,17 @@ const authVerifySlice = createSlice({
         setVerifiedToken: (state, action) => {
             state.verifyToken = action.payload;
         },
+        clearToken: (state, action) => {
+            if (state) {
+                state.token = null;
+                state.email = null;
+                state.message = null;
+                state.role = null;
+                state.verifyToken = false;
+            }
+
+            localStorage.removeItem("currentUser");
+        },
     },
 });
 
