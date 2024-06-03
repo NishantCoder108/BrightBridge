@@ -5,9 +5,10 @@ import { AuthFormData, AuthSchema } from "../../../utils/authValidation";
 import { loginUser } from "../../../api/services/userService";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setToken } from "../../../redux/slices/authSlice";
+import { clearToken, setToken } from "../../../redux/slices/authSlice";
 import { RootState } from "../../../redux/store";
 import { setVerifiedToken } from "../../../redux/slices/verifySlice";
+import axiosInstance from "../../../api/axiosInstance";
 
 const AuthForm: React.FC = () => {
     const {
@@ -21,9 +22,8 @@ const AuthForm: React.FC = () => {
     const [isSignup, setIsSignUp] = useState<boolean>(false);
     const [errResponse, setErrResponse] = useState<string>("");
     const currentUser = localStorage.getItem("currentUser");
-    const verifyToken = useSelector(
-        (state: RootState) => state.verifyToken.verifyToken
-    );
+    const verifyToken = useSelector((state: RootState) => state.verifyToken);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
@@ -52,24 +52,56 @@ const AuthForm: React.FC = () => {
             }
             setErrResponse(errorMessage);
             dispatch(setVerifiedToken(false));
+            clearToken();
         }
     };
-
+    console.log({ verifyToken });
     const handleLoginForm = () => {
         setIsSignUp(!isSignup);
     };
+
+    const fetchVerifyAdmin = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axiosInstance.post("/admin/me");
+            console.log({ response });
+
+            if (response.status === 200 && response.data) {
+                if (response.data.role === "ADMIN") {
+                    dispatch(setVerifiedToken(true));
+                    navigate("/home", { replace: true });
+                } else {
+                    dispatch(setVerifiedToken(false));
+                    navigate("/", { replace: true });
+                    clearToken();
+                }
+                setIsLoading(false);
+            }
+        } catch (error) {
+            setIsLoading(false);
+            console.log({ error });
+            navigate("/", { replace: true });
+
+            dispatch(setVerifiedToken(false));
+            clearToken();
+        }
+    };
     useEffect(() => {
-        if (currentUser && verifyToken) {
+        if (currentUser) {
             const token = JSON.parse(currentUser).token;
             if (!token) {
                 navigate("/");
             } else {
-                navigate("/home");
+                fetchVerifyAdmin();
             }
         } else {
             navigate("/");
         }
-    }, [currentUser, verifyToken]);
+    }, [currentUser]);
+
+    if (isLoading) {
+        return <div>Verifying... </div>;
+    }
     return (
         <div className="flex items-center justify-center h-screen bg-gradient-to-r from-gray-200 to-gray-300">
             <div className="p-6  rounded-md  ">
