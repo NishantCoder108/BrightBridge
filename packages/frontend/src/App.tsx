@@ -3,13 +3,12 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 // import HomePage from "./components/pages/HomePage";
 import { useSelector } from "react-redux";
 import { RootState } from "./types/themeTypes";
-import HomePage from "./components/HomePage";
 import VerifyAdmin from "./components/auth/Admin/VerifyAdmin";
 import AdminHomePage from "./components/pages/Admin/AdminHomePage";
-// import { RootState } from "@types/themeTypes";
 function App() {
     const theme = useSelector((state: RootState) => state.theme.theme);
 
+    console.log({ theme });
     return (
         <>
             <Router>
