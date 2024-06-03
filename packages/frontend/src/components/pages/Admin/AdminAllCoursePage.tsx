@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAllCourses } from "../../../api/services/adminCourseService";
+import CourseCard from "../../common/CourseCard";
+import { ICourseCard } from "../../../interfaces/courseInterface";
 
 const AdminAllCourse = () => {
     const [courses, setCourses] = useState([]);
@@ -27,7 +29,34 @@ const AdminAllCourse = () => {
     console.log({ courses });
     return (
         <div>
-            {!errCourse ? <div>AdminAllCourse</div> : <div>{errCourse}</div>}
+            {!errCourse ? (
+                <div className="flex flex-wrap items-start py-6 gap-6 justify-evenly">
+                    {courses.length > 0 &&
+                        courses.map((course) => {
+                            const {
+                                courseId,
+                                title,
+                                imageurl,
+                                description,
+                                price,
+                                _id,
+                            } = course as ICourseCard;
+
+                            return (
+                                <CourseCard
+                                    key={courseId}
+                                    courseId={_id}
+                                    title={title}
+                                    imageurl={imageurl}
+                                    description={description}
+                                    price={price}
+                                />
+                            );
+                        })}
+                </div>
+            ) : (
+                <div>{errCourse}</div>
+            )}
         </div>
     );
 };
