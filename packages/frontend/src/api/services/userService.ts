@@ -36,17 +36,10 @@ export const loginUser = async (
             role: role ? "ADMIN" : "USER",
         });
         console.log("Login User", { response });
-        return response.data;
+
+        return response;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            const serverError = error as AxiosError<{ message: string }>;
-            if (serverError.response) {
-                throw new Error(
-                    serverError.response.data.message ||
-                        "An error occurred during login."
-                );
-            }
-        }
-        throw new Error("An error occurred during login.");
+        console.log("Login Error", { error });
+        throw error;
     }
 };
