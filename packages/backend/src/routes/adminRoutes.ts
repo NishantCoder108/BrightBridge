@@ -129,7 +129,7 @@ app.get("/courses", isAuthenticate(secret), async (req, res) => {
             });
             return;
         }
-        res.status(200).json({ course });
+        res.status(200).json(course);
     } catch (error) {
         const validationError = error as IValidationError;
 
