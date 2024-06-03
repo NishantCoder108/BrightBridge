@@ -8,8 +8,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearToken, setToken } from "../../../redux/slices/authSlice";
 import { RootState } from "../../../redux/store";
 import { setVerifiedToken } from "../../../redux/slices/verifySlice";
-import axiosInstance from "../../../api/axiosInstance";
+import { AxiosError } from "axios";
+import { verifyAdmin } from "../../../api/services/adminService";
 
+interface IErrMessage {
+    message: string;
+}
 const AuthForm: React.FC = () => {
     const {
         register,
@@ -34,23 +38,24 @@ const AuthForm: React.FC = () => {
         // : loginUser(email, password, role);
 
         try {
-            const authApi = await loginUser(email, password, role);
-            const userData = await authApi;
-            console.log({ userData });
-            dispatch(setToken(userData));
+            const response = await loginUser(email, password, role);
 
-            if (userData.token) {
+            if (response && response.status === 200 && response.data) {
+                const userData = response.data;
                 localStorage.setItem("currentUser", JSON.stringify(userData));
-                navigate("/home");
+                dispatch(setToken(userData));
                 dispatch(setVerifiedToken(true));
+                navigate("/home");
             }
-        } catch (error) {
-            console.error(error);
-            let errorMessage = "Unknown error occurred";
-            if (error instanceof Error) {
-                errorMessage = error.message;
+        } catch (err) {
+            const error = err as AxiosError;
+            if (error.response && error.response.data) {
+                const errMessage = error.response.data;
+
+                const { message } = errMessage as IErrMessage;
+                setErrResponse(message || "Something went wrong");
             }
-            setErrResponse(errorMessage);
+
             dispatch(setVerifiedToken(false));
             clearToken();
         }
@@ -63,10 +68,11 @@ const AuthForm: React.FC = () => {
     const fetchVerifyAdmin = async () => {
         setIsLoading(true);
         try {
-            const response = await axiosInstance.post("/admin/me");
+            const response = await verifyAdmin();
             console.log({ response });
 
-            if (response.status === 200 && response.data) {
+            if (response && response.status === 200 && response.data) {
+                setIsLoading(false);
                 if (response.data.role === "ADMIN") {
                     dispatch(setVerifiedToken(true));
                     navigate("/home", { replace: true });
@@ -75,7 +81,6 @@ const AuthForm: React.FC = () => {
                     navigate("/", { replace: true });
                     clearToken();
                 }
-                setIsLoading(false);
             }
         } catch (error) {
             setIsLoading(false);
@@ -88,17 +93,13 @@ const AuthForm: React.FC = () => {
     };
     useEffect(() => {
         if (currentUser) {
-            const token = JSON.parse(currentUser).token;
-            if (!token) {
-                navigate("/");
-            } else {
-                fetchVerifyAdmin();
-            }
+            fetchVerifyAdmin();
         } else {
             navigate("/");
         }
     }, [currentUser]);
 
+    console.log({ isLoading });
     if (isLoading) {
         return <div>Verifying... </div>;
     }
