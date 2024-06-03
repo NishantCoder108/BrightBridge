@@ -2,84 +2,193 @@ import { Router, Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
+import User from "../models/user.models";
+import Course from "../models/course.models";
+import { createJWTToken, isAuthenticate } from "../utils/jwtAuthenticate";
+import { IAuthRequest, IValidationError } from "../interfaces/authInterface";
+import { IUser } from "../interfaces/userInterface";
 
 const router = Router();
 
-router.get("/users", (req, res) => {
-  res.send("List of all Users ...");
-});
+const secret = process.env.USER_SECRET_KEY;
 
-//Signup
-router.post(
-  "/signup",
-  [body("email").isEmail(), body("password").isLength({ min: 3 })],
-  async (req: Request, res: Response) => {
-    // Input validation
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+//Sign up
 
-    function generateUsername(email: string) {
-      const usernamePart = email.split("@")[0];
-      const randomString = Math.random().toString(36).substring(2, 7);
-
-      return `${usernamePart.substring(2)}_${randomString}`;
-    }
+router.post("/signup", async (req, res) => {
+    const { email, password } = req.body;
 
     try {
-      const userData = req.body;
+        const user = await User.findOne({ email: email });
 
-      // Check if user already exists
-      const existingUser = await User.findOne({ email: userData.email });
-      if (existingUser) {
-        return res.status(400).json({ message: "Email already in use." });
-      }
+        if (user) {
+            return res.status(409).json({
+                message: "User already exists, please login.",
+            });
+        }
 
-      userData.username = generateUsername(userData.email);
+        const newUser = new User({
+            email,
+            password,
+        });
+        await newUser.save();
 
-      // Create and save the new user
-      const newUser = new User(userData);
-      await newUser.save();
+        if (!secret) throw new Error("Something went wrong");
 
-      // Respond with the created user
-      res.status(201).json({ message: "User created successfully" });
-    } catch (err: any) {
-      // General error handling
-      res.status(500).json({ message: "Server error", error: err.message });
+        const token = createJWTToken({ email, id: newUser._id }, secret);
+
+        res.status(201).json({
+            message: " You are successfully signed up",
+            token,
+            email: newUser.email,
+        });
+    } catch (error) {
+        const validationError = error as IValidationError;
+
+        res.status(500).json({
+            message: "Sign-up failed. Please try again later.",
+            error: validationError.message || "Unknown error",
+        });
     }
-  }
-);
+});
 
 //Login
 router.post("/login", async (req: Request, res: Response) => {
-  try {
-    // Find the user by email
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(400).json({ message: "Email does not exist." });
-    }
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user || !secret) {
+            return res.status(400).json({ message: "Email does not exist." });
+        }
 
-    // Check if the password is correct
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password." });
-    }
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid password." });
+        }
 
-    // User is authenticated, proceed with generating a token/session
-    if (isMatch) {
-      const token = jwt.sign(
-        { userId: user._id }, // Payload
-        process.env.JWT_SECRET as string, // Secret key
-        { expiresIn: "1h" } // Expiration time
-      );
+        const token = createJWTToken(
+            { email: user.email, id: user._id },
+            secret
+        );
 
-      res.json({ token });
+        res.json({
+            message: "You are successfully logged in",
+            token,
+            email: user.email,
+        });
+    } catch (err) {
+        const validationError = err as IValidationError;
+        res.status(500).json({
+            message: "Server error",
+            error: validationError.message,
+        });
     }
-  } catch (err: any) {
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
 });
 
+//Get all courses
+
+router.get("/courses", isAuthenticate(secret), async (req, res) => {
+    try {
+        const course = await Course.find({});
+
+        if (!course || course.length === 0) {
+            res.status(200).json({
+                message: "No courses available at the moment.",
+                course: course,
+            });
+            return;
+        }
+
+        res.json({
+            message: "All courses retrieved successfully.",
+            courses: course,
+        });
+    } catch (error) {
+        const validationError = error as IValidationError;
+
+        res.status(500).json({
+            message: "Failed to retrieve courses.",
+            error: validationError.message || "Unknown error",
+        });
+    }
+});
+
+//Buy courses
+router.post(
+    "/courses/:courseId",
+    isAuthenticate(secret),
+    async (req: IAuthRequest, res) => {
+        try {
+            const { courseId } = req.params;
+            const reqData = req.user;
+
+            const { email, id } = reqData as IUser;
+            console.log({ reqData });
+
+            const user = await User.findById({ _id: id }).select("-password");
+            console.log({ user });
+
+            const course = await Course.findById({ _id: courseId });
+            console.log({ course });
+
+            if (!user || !course) {
+                throw new Error("Course not found ,please try again");
+            }
+            const purchasedCourses = user.purchasedCourses;
+
+            if (purchasedCourses.includes(course.id)) {
+                res.status(400).json({
+                    message: "Course already purchased",
+                });
+                return;
+            }
+
+            user.purchasedCourses.push(course.id);
+            await user.save();
+
+            res.status(201).json({
+                message: "Course purchased successfully",
+                courseId: course.id,
+            });
+        } catch (error) {
+            const validationError = error as IValidationError;
+            res.status(500).json({
+                message: "An error occurred while purchasing course",
+                error: validationError.message || "Unknown error",
+            });
+        }
+    }
+);
+
+router.get(
+    "/purchasedCourse",
+    isAuthenticate(secret),
+    async (req: IAuthRequest, res) => {
+        try {
+            const { email, id } = req.user as IUser;
+
+            const user = await User.findById({ _id: id }).populate(
+                "purchasedCourses"
+            );
+
+            if (!user) {
+                throw new Error("User not found, please try again");
+            }
+            const purchasedCourse = user.purchasedCourses || [];
+
+            res.status(200).json({
+                message: "All purchased courses",
+                course: purchasedCourse,
+            });
+        } catch (error) {
+            const validationError = error as IValidationError;
+            res.status(500).json({
+                message: "No course",
+                error: validationError.message || "Unknown error",
+            });
+        }
+    }
+);
+
+router.post("/me", isAuthenticate(secret), (req: IAuthRequest, res) => {
+    res.json(req.user);
+});
 export default router;
