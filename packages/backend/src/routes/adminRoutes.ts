@@ -46,16 +46,21 @@ const secret = process.env.ADMIN_SECRET_KEY;
 
 //Login
 app.post("/login", async (req, res) => {
-    const { username, password, role } = req.body;
-    const adminUsername = process.env.ADMIN_USERNAME;
+    const { email, password, role } = req.body;
+    const adminEmail = process.env.ADMIN_USERNAME;
     const adminPassword = process.env.ADMIN_PASSWORD;
 
+    console.log("Req body", req.body);
+    console.log({ adminEmail, adminPassword });
     try {
         const adminUser =
-            adminUsername === username &&
+            adminEmail === email &&
             adminPassword === password &&
             role === "ADMIN";
 
+        console.log(adminEmail === email);
+        console.log(adminPassword === password);
+        console.log(role === "ADMIN");
         console.log({ adminUser });
         if (!adminUser || !secret) {
             res.status(403).json({
@@ -64,11 +69,13 @@ app.post("/login", async (req, res) => {
 
             return;
         }
-        const token = createJWTToken({ username, role: "ADMIN" }, secret);
+        const token = createJWTToken({ email, role: "ADMIN" }, secret);
 
         res.json({
             message: "You are successfully logged in",
             token,
+            role,
+            email,
         });
     } catch (error) {
         console.log(error);
@@ -187,4 +194,7 @@ app.delete("/courses/:courseId", isAuthenticate(secret), async (req, res) => {
     }
 });
 
+app.post("/me", isAuthenticate(secret), (req: IAuthRequest, res) => {
+    res.json(req.user);
+});
 export default app;
