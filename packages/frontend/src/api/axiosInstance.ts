@@ -61,11 +61,15 @@ axiosInstance.interceptors.response.use(
         console.log("Axios Response Error", error);
 
         if (error.response && error.response.status >= 400) {
-            localStorage.removeItem("currentUser");
-            window.location.replace(baseURL);
+            const currUser = localStorage.getItem("currentUser");
+
+            if (currUser) {
+                localStorage.removeItem("currentUser");
+                window.location.replace(baseURL);
+            }
         }
 
-        Promise.reject(error);
+        return Promise.reject(error);
     }
 );
 
