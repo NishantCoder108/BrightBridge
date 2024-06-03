@@ -22,7 +22,7 @@ const authVerifySlice = createSlice({
         setVerifiedToken: (state, action) => {
             state.verifyToken = action.payload;
         },
-        clearToken: (state, action) => {
+        clearToken: (state) => {
             if (state) {
                 state.token = null;
                 state.email = null;
