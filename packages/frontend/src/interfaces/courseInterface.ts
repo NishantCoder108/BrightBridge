@@ -7,3 +7,8 @@ export interface ICourseCard {
     courseId?: string;
     _id?: string;
 }
+
+export interface ICourseCreate {
+    message: string;
+    courseId: string;
+}
