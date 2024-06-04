@@ -39,3 +39,15 @@ export const getAllCourses = async () => {
         throw new Error("An error occurred during getting courses.");
     }
 };
+
+export const createCourse = async (data: object) => {
+    try {
+        const response = await AxiosInstances.post("/admin/courses", data);
+        console.log("Created Courses", { response });
+        return response;
+    } catch (error) {
+        console.error("Error Creating Course :", error);
+
+        throw error;
+    }
+};
