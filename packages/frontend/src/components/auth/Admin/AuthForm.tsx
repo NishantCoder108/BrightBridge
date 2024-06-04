@@ -97,7 +97,7 @@ const AuthForm: React.FC = () => {
         } else {
             navigate("/");
         }
-    }, [currentUser]);
+    }, []);
 
     console.log({ isLoading });
     if (isLoading) {
