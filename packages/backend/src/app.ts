@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === "production") {
 }
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api/user", userRoutes);
+// app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
 export default app;

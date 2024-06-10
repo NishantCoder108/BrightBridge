@@ -1,15 +1,12 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createCourse } from "../../../api/services/adminCourseService";
 
-enum GenderEnum {
-    female = "female",
-    male = "male",
-    other = "other",
-}
-
 interface IFormInput {
-    firstName: string;
-    gender: GenderEnum;
+    imageurl?: string;
+    title: string;
+    description?: string;
+    price: number;
+    isPublished?: boolean;
 }
 
 interface IProps {
@@ -18,22 +15,12 @@ interface IProps {
 }
 const AdminCreateCourse = ({ refreshData, handleRefreshData }: IProps) => {
     const { register, handleSubmit } = useForm<IFormInput>();
+
     const onSubmit: SubmitHandler<IFormInput> = async (data) => {
         console.log(data);
-        // reset("firstName");
 
         try {
-            const ddd = {
-                imageurl:
-                    "https://t4.ftcdn.net/jpg/01/17/48/95/360_F_117489540_elCLsL6KJwO3TvivV5n2NtGuUvR6RCEw.jpg",
-                title: "One day ,You will be Billionaire",
-                description:
-                    "Practice makes one day succesfull person,Beliefing in yourself is very important aspects in life , so just your work with belief , that one day ,you will be succussfully. ",
-                price: 9999,
-                isPublished: false,
-            };
-            const response = await createCourse(ddd);
-
+            const response = await createCourse(data);
             console.log(response);
 
             if (response && response.status === 201 && response.data) {
@@ -49,15 +36,67 @@ const AdminCreateCourse = ({ refreshData, handleRefreshData }: IProps) => {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <label>First Name</label>
-                <input {...register("firstName")} />
-                <label>Gender Selection</label>
-                <select {...register("gender")}>
-                    <option value="female">female</option>
-                    <option value="male">male</option>
-                    <option value="other">other</option>
-                </select>
-                <input type="submit" />
+                <div className="mb-3">
+                    <label htmlFor="title">Title</label>
+                    <input
+                        id="title"
+                        type="text"
+                        {...register("title")}
+                        placeholder="Create course title"
+                        className="w-full px-4 py-2  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="description">Description</label>
+                    <input
+                        id="description"
+                        type="text"
+                        {...register("description")}
+                        placeholder="Create course description"
+                        className="w-full px-4 py-2  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="price">Price</label>
+                    <input
+                        id="price"
+                        type="number"
+                        {...register("price")}
+                        placeholder="Create course price"
+                        className="w-full px-4 py-2  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="imageurl">Image Url</label>
+                    <input
+                        id="imageurl"
+                        type="text"
+                        {...register("imageurl")}
+                        placeholder=" Image url "
+                        className="w-full px-4 py-2  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="isPublished">Is Published</label>
+                    <input
+                        id="isPublished"
+                        type="checkbox"
+                        {...register("isPublished")}
+                        placeholder="Create course price"
+                        className="w-full px-4 py-2  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className="w-full px-4 py-2 mt-4 bg-blue-500 text-white font-semibold rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                >
+                    Submit
+                </button>{" "}
+                {/* {errResponse && (
+                        <p className="text-red-500 text-xs text-center italic">
+                            {errResponse}
+                        </p>
+                    )} */}
             </form>
         </div>
     );
