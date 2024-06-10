@@ -27,8 +27,10 @@ jobs:
 
             - name: Deploy to AWS
               run: |
-               ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_SSH_USERNAME }}@${{ secrets.AWS_SSH_HOST }} "cd BrightBridge/packages/backend/ && sudo bash deploy.sh"
-
+                  ssh -o StrictHostKeyChecking=no ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} << 'EOF'
+                   cd BrightBridge/packages/backend/
+                   chmod 600 deploy.sh && bash deploy.sh
+                  EOF
 
 # Other method
 # run: |
