@@ -34,7 +34,7 @@ jobs:
               run: |
                ssh -t -o StrictHostKeyChecking=no ${{ secrets.AWS_SSH_USERNAME }}@${{ secrets.AWS_SSH_HOST }} << 'EOF'
                 cd /home/ubuntu/BrightBridge/packages/backend/
-                "sudo bash deploy.sh"
+                sudo bash ./deploy.sh
                EOF
 # Other method
 # run: |
