@@ -22,6 +22,8 @@ jobs:
               run: |
                   echo "$AWS_SSH_PRIVATE_KEY" > keyfile
                   chmod 600 keyfile
+                  mkdir -p ~/.ssh
+                  cp known_hosts ~/.ssh/known_hosts
                   ssh -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash ~/deploy.sh"
 
 # Other method
