@@ -9,12 +9,12 @@
         "start": "node dist/server.js",
         "start:dev": "nodemon --exec ts-node src/server.ts",
         "start:prod": "npm run build && pm2 start ecosystem.config.js --env production",
-        "stop:pm2": "pm2 stop my-backend-app",
-        "restart:pm2": "pm2 restart my-backend-app",
-        "delete:pm2": "pm2 delete my-backend-app",
-        "logs": "pm2 logs my-backend-app",
+        "stop:pm2": "pm2 stop bright-bridge-backend",
+        "restart:pm2": "pm2 restart bright-bridge-backend",
+        "delete:pm2": "pm2 delete bright-bridge-backend",
+        "logs": "pm2 logs bright-bridge-backend",
         "status": "pm2 status",
-        "update:aws": "git pull && npm install && npm run build && pm2 restart my-backend-app"
+        "update:aws": "git pull && npm install && npm run build && pm2 restart bright-bridge-backend"
     },
     "license": "MIT",
     "dependencies": {
