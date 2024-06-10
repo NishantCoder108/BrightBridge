@@ -15,16 +15,18 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3 # This step checks out the repository's code
 
+
+            - name: Authenticate SSH
+              uses: webfactory/ssh-agent@v0.5.3
+              with:
+                  ssh-private-key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+
             - name: SSH and deploy
               env:
                   AWS_SSH_PRIVATE_KEY: ${{secrets.AWS_SSH_PRIVATE_KEY}}
 
-              run: |
-                  echo "$AWS_SSH_PRIVATE_KEY" > keyfile
-                  chmod 600 keyfile
-                  mkdir -p ~/.ssh
-                  cp known_hosts ~/.ssh/known_hosts
-                  ssh -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash ~/deploy.sh"
+              run: |                 
+                  ssh -o StrictHostKeyChecking=no -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash ~/deploy.sh"
 
 # Other method
 # run: |
