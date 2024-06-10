@@ -4,8 +4,8 @@ on:
     push:
         branches:
             - master # Change this to your branch if different
-        paths:
-            - "packages/backend/**" # Trigger only when there are changes in the packages/backend folder
+        # paths:
+        #     - "packages/backend/**" # Trigger only when there are changes in the packages/backend folder
 
 jobs:
     deploy:
@@ -22,9 +22,6 @@ jobs:
               run: |
                   echo "$AWS_SSH_PRIVATE_KEY" > keyfile
                   chmod 600 keyfile
-                  mkdir -p ~/.ssh
-                  cd known_hosts ~/.ssh/known_hosts
-
                   ssh -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash ~/deploy.sh"
 
 # Other method
@@ -37,3 +34,5 @@ jobs:
 
 #  ${{ secrets.AWS_SSH_PRIVATE_KEY }}
 # ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}}
+# # mkdir -p ~/.ssh
+ # cd known_hosts ~/.ssh/known_hosts
