@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
     push:
         branches:
-            - main # Change this to your branch if different
+            - master # Change this to your branch if different
         paths:
             - "packages/backend/**" # Trigger only when there are changes in the packages/backend folder
 
