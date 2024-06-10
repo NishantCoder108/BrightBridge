@@ -25,9 +25,11 @@ jobs:
               env:
                   AWS_SSH_PRIVATE_KEY: ${{secrets.AWS_SSH_PRIVATE_KEY}}
 
-              run: |                 
-                  ssh -o StrictHostKeyChecking=no -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash ~deploy.sh"
-
+              run: |
+                ssh -t -o StrictHostKeyChecking=no ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} << 'EOF'
+                 cd BrightBridge/packages/backend/
+                 sudo bash deploy.sh
+                EOF
 # Other method
 # run: |
 #     echo "$SSH_PRIVATE_KEY" > keyfile
