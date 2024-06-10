@@ -1,0 +1,38 @@
+name: Deploy to AWS
+
+on:
+    push:
+        branches:
+            - main # Change this to your branch if different
+        paths:
+            - "packages/backend/**" # Trigger only when there are changes in the packages/backend folder
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3 # This step checks out the repository's code
+
+            - name: Authenticate SSH
+              uses: webfactory/ssh-agent@v0.5.3
+              with:
+                  ssh-private-key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+
+            - name: Deploy to AWS
+              run: |
+              ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_SSH_USERNAME }}@${{ secrets.AWS_SSH_HOST }} << 'EOF'
+                 cd packages/backend
+                 npm run update:aws
+               EOF
+
+    
+# Other method
+# run: |
+#     echo "$SSH_PRIVATE_KEY" > keyfile
+#     chmod 600 keyfile
+#     mkdir -p ~/.ssh
+#     cd known_hosts ~/.ssh/known_hosts
+#     ssh -t -i keyfile ubuntu@ec2-13-54-33-149.ap-southeast-2.compute.amazonaws.com "sudo bash "
+
