@@ -26,7 +26,7 @@ jobs:
                   AWS_SSH_PRIVATE_KEY: ${{secrets.AWS_SSH_PRIVATE_KEY}}
 
               run: |                 
-                  ssh -o StrictHostKeyChecking=no -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash ~/deploy.sh"
+                  ssh -o StrictHostKeyChecking=no -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash deploy.sh"
 
 # Other method
 # run: |
