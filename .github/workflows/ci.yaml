@@ -15,22 +15,17 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3 # This step checks out the repository's code
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: "20.5.0"
+            - name: SSH and deploy
+              env:
+                  AWS_SSH_PRIVATE_KEY: ${{secrets.AWS_SSH_PRIVATE_KEY}}
 
-            - name: Authenticate SSH
-              uses: webfactory/ssh-agent@v0.5.3
-              with:
-                  ssh-private-key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
-
-            - name: Deploy to AWS
               run: |
-                  ssh -o StrictHostKeyChecking=no ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} << 'EOF'
-                   cd BrightBridge/packages/backend/
-                   chmod 600 deploy.sh && bash deploy.sh
-                  EOF
+                  echo "$AWS_SSH_PRIVATE_KEY" > keyfile
+                  chmod 600 keyfile
+                  mkdir -p ~/.ssh
+                  cd known_hosts ~/.ssh/known_hosts
+
+                  ssh -t -i keyfile ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} "sudo bash ~/deploy.sh"
 
 # Other method
 # run: |
@@ -40,3 +35,5 @@ jobs:
 #     cd known_hosts ~/.ssh/known_hosts
 #     ssh -t -i keyfile ubuntu@ec2-13-54-33-149.ap-southeast-2.compute.amazonaws.com "sudo bash "
 
+#  ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+# ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}}
