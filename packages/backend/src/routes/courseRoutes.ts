@@ -3,7 +3,7 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/courses", (req, res) => {
-  res.send("List of Courses");
+  res.json({courses:"All courses list",status:200});
 });
 
 router.post("/courses", (req, res) => {

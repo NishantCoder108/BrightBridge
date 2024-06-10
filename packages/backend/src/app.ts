@@ -5,6 +5,7 @@ import cors, { CorsOptions } from "cors";
 import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import dbConnect from "./DB";
+import courseRoutes from "./routes/courseRoutes";
 
 const app = express();
 
@@ -30,7 +31,8 @@ const corsOptions: CorsOptions = {
 // Use the CORS middleware
 app.use(cors(corsOptions));
 
-dbConnect();
+dbConnect()
+
 if (process.env.NODE_ENV === "production") {
     console.log = () => {};
 }
@@ -39,4 +41,5 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
+       
 export default app;
