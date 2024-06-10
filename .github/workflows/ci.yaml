@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
     push:
         branches:
-            - main # Change this to your branch if different
+            - master # Change this to your branch if different
         paths:
             - "packages/backend/**" # Trigger only when there are changes in the packages/backend folder
 
@@ -23,10 +23,10 @@ jobs:
 
             - name: Deploy to AWS
               run: |
-               ssh -o StrictHostKeyChecking=no ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} << 'EOF'
-               cd packages/backend
-               npm run update:aws
-               EOF
+                ssh -o StrictHostKeyChecking=no ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} << 'EOF'
+                 cd packages/backend
+                 npm run update:aws
+                EOF
 
            
 
