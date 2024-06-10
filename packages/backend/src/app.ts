@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import cors, { CorsOptions } from "cors";
 import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
-import courseRoutes from "./routes/courseRoutes";
 import dbConnect from "./DB";
 
 const app = express();
@@ -39,6 +38,5 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/user", courseRoutes);
 
 export default app;
