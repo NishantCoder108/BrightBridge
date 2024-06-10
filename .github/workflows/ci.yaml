@@ -21,7 +21,7 @@ jobs:
                   ssh-private-key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
 
             - name: Deploy to AWS
-              run: |
+              run: 
               ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_SSH_USERNAME }}@${{ secrets.AWS_SSH_HOST }} << 'EOF'
                  cd packages/backend
                  npm run update:aws
