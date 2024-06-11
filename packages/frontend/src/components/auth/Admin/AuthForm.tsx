@@ -5,7 +5,7 @@ import { AuthFormData, AuthSchema } from "../../../utils/authValidation";
 import { loginUser } from "../../../api/services/userService";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearToken, setToken } from "../../../redux/slices/authSlice";
+import { clearToken } from "../../../redux/slices/authSlice";
 import { RootState } from "../../../redux/store";
 import { setVerifiedToken } from "../../../redux/slices/verifySlice";
 import { AxiosError } from "axios";
@@ -43,7 +43,7 @@ const AuthForm: React.FC = () => {
             if (response && response.status === 200 && response.data) {
                 const userData = response.data;
                 localStorage.setItem("currentUser", JSON.stringify(userData));
-                dispatch(setToken(userData));
+                // dispatch(setToken(userData));
                 dispatch(setVerifiedToken(true));
                 navigate("/home");
             }
