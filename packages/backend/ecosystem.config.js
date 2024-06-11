@@ -1,9 +1,18 @@
 module.exports = {
     apps: [
         {
-            name: "bright-bridge-backend", // This is the PM2 app name
+            name: "bright-bridge-frontend",
+            script: "npm",
+            args: "run build-and-copy",
+            cwd: "../frontend",
+            env: {
+                NODE_ENV: "production",
+            },
+        },
+        {
+            name: "bright-bridge-backend",
             script: "./dist/server.js",
-            instances: "1", //it depends , how many instances you want e.g. max or 1 or4 instances anything
+            instances: "1",
             exec_mode: "cluster",
             env: {
                 NODE_ENV: "development",
