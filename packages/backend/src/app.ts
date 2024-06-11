@@ -6,10 +6,11 @@ import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import dbConnect from "./DB";
 import courseRoutes from "./routes/courseRoutes";
+import path from "path";
 
 const app = express();
 
-const allowedOrigins: string[] = ["http://localhost:5173"];
+const allowedOrigins: string[] = ["http://localhost:3000"];
 
 const corsOptions: CorsOptions = {
     origin: function (
@@ -29,7 +30,7 @@ const corsOptions: CorsOptions = {
 };
 
 // Use the CORS middleware
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 dbConnect();
 
@@ -38,7 +39,8 @@ if (process.env.NODE_ENV === "production") {
 }
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "..", "public")));
 app.use("/api/user", userRoutes);
-// app.use("/api/admin", adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 export default app;
