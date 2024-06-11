@@ -25,7 +25,7 @@ jobs:
               env:
                   AWS_SSH_PRIVATE_KEY: ${{secrets.AWS_SSH_PRIVATE_KEY}}
 
-              run: ssh -o StrictHostKeyChecking=no ubuntu@${{secrets.AWS_SSH_HOST}} 'bash -s' < /BrightBridge/packages/backend/deploy.sh
+              run: ssh -o StrictHostKeyChecking=no ubuntu@${{secrets.AWS_SSH_HOST}} 'bash -s' < ./packages/backend/deploy.sh
              
                # run: |
               #   ssh -t -o StrictHostKeyChecking=no ${{secrets.AWS_SSH_USERNAME}}@${{secrets.AWS_SSH_HOST}} << 'EOF'
